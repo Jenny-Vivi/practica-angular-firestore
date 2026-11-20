@@ -21,6 +21,7 @@ export interface Producto {
   stock: number;
   categoria: string;
 }
+```
 
 ## Vercel
 https://practica-angular-firestore.vercel.app 
