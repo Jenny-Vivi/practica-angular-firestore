@@ -1,0 +1,106 @@
+<div class="contenedor">
+  <h1>Gestión de Productos (Angular + Cloud Firestore)</h1>
+
+  <!-- Mensajes de feedback y error -->
+  @if (mensajeError()) {
+    <div class="alerta alerta-error">{{ mensajeError() }}</div>
+  }
+  @if (mensajeExito()) {
+    <div class="alerta alerta-exito">{{ mensajeExito() }}</div>
+  }
+
+  <!-- Formulario de Creacion y Edicion -->
+  <div class="card">
+    <h2>{{ productoEditandoId() ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+
+    <form [formGroup]="productoForm" (ngSubmit)="guardarProducto()">
+      <div class="grid-form">
+        <div class="campo">
+          <label for="nombre">Nombre *</label>
+          <input id="nombre" type="text" formControlName="nombre" placeholder="Ej. Monitor Samsung 24" />
+          @if (productoForm.get('nombre')?.invalid && productoForm.get('nombre')?.touched) {
+            <small class="error-texto">El nombre es obligatorio.</small>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="categoria">Categoría *</label>
+          <input id="categoria" type="text" formControlName="categoria" placeholder="Ej. Monitores" />
+          @if (productoForm.get('categoria')?.invalid && productoForm.get('categoria')?.touched) {
+            <small class="error-texto">La categoría es obligatoria.</small>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="precio">Precio ($) *</label>
+          <input id="precio" type="number" step="0.01" formControlName="precio" placeholder="0.00" />
+          @if (productoForm.get('precio')?.invalid && productoForm.get('precio')?.touched) {
+            <small class="error-texto">Ingresa un precio numérico mayor o igual a 0.</small>
+          }
+        </div>
+
+<div class="campo">
+          <label for="stock">Stock *</label>
+          <input id="stock" type="number" step="1" formControlName="stock" placeholder="0" />
+          @if (productoForm.get('stock')?.invalid && productoForm.get('stock')?.touched) {
+            <small class="error-texto">Ingresa un número entero válido 0 o mayor.</small>
+          }
+        </div>
+      </div>
+
+      <div class="acciones-form">
+        <button type="submit" class="btn btn-primario">
+          {{ productoEditandoId() ? 'Actualizar Producto' : 'Agregar Producto' }}
+        </button>
+        @if (productoEditandoId()) {
+          <button type="button" class="btn btn-secundario" (click)="cancelarEdicion()">
+            Cancelar
+          </button>
+        }
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabla de Productos -->
+  <div class="card">
+    <h2>Inventario Actual</h2>
+
+    @if (cargando()) {
+      <p>Cargando productos desde Firebase...</p>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (prod of productos(); track prod.id) {
+            <tr>
+              <td>{{ prod.nombre }}</td>
+              <td>{{ prod.categoria }}</td>
+              <td>${{ prod.precio | number:'1.2-2' }}</td>
+              <td>{{ prod.stock }}</td>
+              <td class="acciones-tabla">
+                <button type="button" class="btn btn-editar" (click)="seleccionarParaEditar(prod)">
+                  Editar
+                </button>
+                <button type="button" class="btn btn-eliminar" (click)="eliminarProducto(prod)">
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="texto-centro">No hay productos registrados en Firestore.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
